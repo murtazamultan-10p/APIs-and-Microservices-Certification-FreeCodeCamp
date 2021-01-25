@@ -24,22 +24,27 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
-app.get("/api/timestamp/2015-12-25", (req,res)=>{
-  res.json({
-    "unix": new Date('2015.12.25').getTime() / 1000,
-    "utc": new Date('2015-12-25').toUTCString()
-  });
+app.get("/api/timestamp/:date?", (req,res)=>{
+  
+
+  if(req.params.date.includes("-"))
+  {
+    res.json({
+      "unix": new Date('2015.12.25').getTime() / 1000,
+      "utc": new Date('2015-12-25').toUTCString()
+    });
+  }
+  else
+  {
+    var date = new Date(1451001600000).toLocaleDateString("en-US");
+
+    res.json({
+      "unix": 1451001600000,
+      "utc": new Date(convertDate(date)).toUTCString()
+    });
+  }
 });
 
-app.get("/api/timestamp/1451001600000", (req,res)=>{
-  
-  var date = new Date(1451001600000).toLocaleDateString("en-US");
-
-  res.json({
-    "unix": 1451001600000,
-    "utc": new Date(convertDate(date)).toUTCString()
-  });
-})
 
 function convertDate (userDate) {
     return userDate.substr(6,4) + "-" + userDate.substr(0,2) + "-" +  userDate.substr(3,2);
