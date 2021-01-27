@@ -55,14 +55,28 @@ app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
 });
 
+app.get('/api/shorturl/:short_url?',  (req,res)=>{
+  const urlCode = parseInt(req.params.short_url);
+  // console.log(req.params.short_url)
+
+  URLModel.findOne({short_url: urlCode}, (err, data) => {
+    if(!err && data != undefined){
+      console.log("\n/Short-URL route called\nCode: "+ String(urlCode) + " Link: "+ data.original_url);    
+      res.redirect(data.original_url)
+    }
+    else{
+      console.log(data)
+      res.json({error: 'URL Not Found'})
+    }
+  });
+});
 
  let responseObject = {}
 
 app.post('/api/shorturl/new', (req,res)=>{
   
   const url = req.body['url'];
-
-
+  
   let matchUrl1=url.replace(/^((https?):\/\/)/,'');
   let matchUrl= matchUrl1.split('/')[0];
 
@@ -97,6 +111,8 @@ app.post('/api/shorturl/new', (req,res)=>{
                 if (!error) {
                   responseObject["short_url"] = data.short_url;
                   res.json(responseObject);
+                  console.log("\n/New route called\nCode: "+ String(responseObject["short_url"]) + " Link: "+ responseObject["original_url"]);    
+
                   data.save();
                 }
               }
@@ -108,20 +124,7 @@ app.post('/api/shorturl/new', (req,res)=>{
   });
 });
 
-app.post('/api/shorturl/:short_url?',  (req,res)=>{
-  let urlCode = parseInt(req.params.short_url);
-  
 
-  URLModel.findOne({short_url: urlCode}, (err, data) => {
-    if(!err && data != undefined){
-      res.redirect(data.original_url)
-    }
-    else{
-      console.log(data)
-      res.json({error: 'URL Not Found'})
-    }
-  });
-});
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
